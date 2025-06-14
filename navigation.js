@@ -49,7 +49,7 @@ scene.add(sunMesh);
 
 // Mercurio
 const MercuryTexture = textureLoader.load("textures/Mercurio.jpg");
-const MercuryGeometry = new THREE.SphereGeometry(0.9, 32, 32);
+const MercuryGeometry = new THREE.SphereGeometry(0.38, 32, 32);
 const MercuryMaterial = new THREE.MeshBasicMaterial({
     map: MercuryTexture,
     depthTest: true,
@@ -61,7 +61,7 @@ scene.add(MercuryMesh);
 
 // Venus
 const VenusTexture = textureLoader.load("textures/Venus.jpg");
-const VenusGeometry = new THREE.SphereGeometry(0.9, 32, 32);
+const VenusGeometry = new THREE.SphereGeometry(0.95, 32, 32);
 const VenusMaterial = new THREE.MeshBasicMaterial({
     map: VenusTexture,
     depthTest: true,
@@ -74,7 +74,7 @@ scene.add(VenusMesh);
 
 // Terra
 const worldTexture = textureLoader.load("textures/small-world.jpg");
-const worldGeometry = new THREE.SphereGeometry(0.9, 32, 32);
+const worldGeometry = new THREE.SphereGeometry(1, 32, 32);
 const worldMaterial = new THREE.MeshBasicMaterial({
     map: worldTexture,
     depthTest: true,
@@ -85,7 +85,7 @@ const worldMesh = new THREE.Mesh(worldGeometry, worldMaterial);
 scene.add(worldMesh);
 // Nuvens da Terra
 const cloudTexture = textureLoader.load("textures/small-world-clouds.png");
-const cloudGeometry = new THREE.SphereGeometry(0.905, 32, 32);
+const cloudGeometry = new THREE.SphereGeometry(1.05, 32, 32);
 const cloudMaterial = new THREE.MeshBasicMaterial({
     map: cloudTexture,
     transparent: true,
@@ -97,7 +97,7 @@ scene.add(cloudMesh);
 
 // Marte
 const marsTexture = textureLoader.load("textures/Marte.jpg");
-const marsGeometry = new THREE.SphereGeometry(0.9, 32, 32);
+const marsGeometry = new THREE.SphereGeometry(0.60, 32, 32);
 const marsMaterial = new THREE.MeshBasicMaterial({
     map: marsTexture,
     depthTest: true,
@@ -109,7 +109,7 @@ scene.add(marsMesh);
 
 // Jupiter 
 const JupiterTexture = textureLoader.load("textures/Jupiter.jpg");
-const JupiterGeometry = new THREE.SphereGeometry(2, 32, 32);
+const JupiterGeometry = new THREE.SphereGeometry(11.2, 32, 32);
 const JupiterMaterial = new THREE.MeshBasicMaterial({
     map: JupiterTexture,
     depthTest: true,
@@ -121,7 +121,7 @@ scene.add(JupiterMesh);
 
 // Saturno
 const SaturnTexture = textureLoader.load("textures/Saturno.jpg");
-const SaturnGeometry = new THREE.SphereGeometry(2.5, 32, 32);
+const SaturnGeometry = new THREE.SphereGeometry(9.5, 32, 32);
 const SaturnMaterial = new THREE.MeshBasicMaterial({
     map: SaturnTexture,
     depthTest: true,
@@ -133,7 +133,7 @@ scene.add(SaturnMesh);
 
 // Aneis de Saturno
 const SaturnRingTexture = textureLoader.load("textures/Anel_de_Saturno.png");
-const SarturnRingGeometry = new THREE.RingGeometry(4, 6.5, 128); 
+const SarturnRingGeometry = new THREE.RingGeometry(11, 15, 100); 
 const SaturnRingmaterial = new THREE.MeshBasicMaterial({ 
     map: SaturnRingTexture,
     side: THREE.DoubleSide,
@@ -148,7 +148,7 @@ scene.add(SaturnRingMesh);
 
 // Urano
 const UranoTexture = textureLoader.load("textures/Uranos.jpg");
-const UranoGeometry = new THREE.SphereGeometry(2, 32, 32);
+const UranoGeometry = new THREE.SphereGeometry(4, 32, 32);
 const UranonMaterial = new THREE.MeshBasicMaterial({
     map: UranoTexture,
     depthTest: true,
@@ -160,7 +160,7 @@ scene.add(UranoMesh);
 
 // Netuno
 const NeptuneTexture = textureLoader.load("textures/Netuno.jpg");
-const NeptuneGeometry = new THREE.SphereGeometry(2, 32, 32);
+const NeptuneGeometry = new THREE.SphereGeometry(3.88, 32, 32);
 const NeptuneMaterial = new THREE.MeshBasicMaterial({
     map: NeptuneTexture,
     depthTest: true,
@@ -184,7 +184,7 @@ scene.add(new THREE.AxesHelper(10));
 const gridHelper = new THREE.GridHelper(10000, 1500); 
 scene.add(gridHelper);
 gridHelper.material.transparent = true;
-gridHelper.material.opacity = 0.35;
+gridHelper.material.opacity = 0.2;
 
 // const gridHelper2 = new THREE.GridHelper(10000, 10000); 
 // scene.add(gridHelper2);
@@ -201,11 +201,11 @@ function animate() {
     worldMesh.position.x = 40;
     cloudMesh.position.x = 40;
     marsMesh.position.x = 50;
-    JupiterMesh.position.x = 60;
-    SaturnMesh.position.x = 70;
-    UranoMesh.position.x = 80;
-    NeptuneMesh.position.x = 90;
-    SaturnRingMesh.position.x = 70;
+    JupiterMesh.position.x = 75;
+    SaturnMesh.position.x = 115;
+    SaturnRingMesh.position.x = 115;
+    UranoMesh.position.x = 150;
+    NeptuneMesh.position.x = 180;
 
     worldMesh.rotation.y += 0.0005;
     cloudMesh.rotation.y -= 0.005;

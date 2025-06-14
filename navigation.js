@@ -3,6 +3,17 @@ import { OrbitControls } from "https://esm.sh/three/addons/controls/OrbitControl
 
 // ATUALIZAÇÂO 1.0.5 CHAT DEU UMA SALVADA NAS PROPORÇÕES
 
+const defaultCameraPos = new THREE.Vector3(100, 100, 200);
+const defaultTarget = new THREE.Vector3(0, 0, 0);
+
+window.addEventListener("keydown", (event) => {
+  if (event.key.toLowerCase() === "f") {
+    camera.position.copy(defaultCameraPos);
+    controls.target.copy(defaultTarget);
+    controls.update();
+  }
+});
+
 // Constante para escalar o universo
 const SCALE = 1e-6;
 
@@ -94,6 +105,29 @@ const cloudMaterial = new THREE.MeshBasicMaterial({
 });
 const cloudMesh = new THREE.Mesh(cloudGeometry, cloudMaterial);
 scene.add(cloudMesh);
+// lua
+// Textura da Lua
+const moonTexture = textureLoader.load("textures/Lua.jpg");
+
+// Grupo de órbita da Lua (orbita a Terra)
+const moonOrbit = new THREE.Object3D();
+moonOrbit.position.set(40, 0, 0); // Mesmo X da Terra
+scene.add(moonOrbit);
+
+// Criar a Lua
+const moonGeometry = new THREE.SphereGeometry(0.27, 32, 32); // Lua tem ~27% do tamanho da Terra
+const moonMaterial = new THREE.MeshBasicMaterial({
+    map: moonTexture,
+    depthTest: true,
+    depthWrite: true,
+    transparent: false
+});
+const moonMesh = new THREE.Mesh(moonGeometry, moonMaterial);
+
+// Posicionar a Lua ao redor da Terra (no raio da órbita)
+moonMesh.position.set(2, 0, 0); // Distância da Terra (2 unidades)
+moonOrbit.add(moonMesh);
+
 
 // Marte
 const marsTexture = textureLoader.load("textures/Marte.jpg");
@@ -133,7 +167,7 @@ scene.add(SaturnMesh);
 
 // Aneis de Saturno
 const SaturnRingTexture = textureLoader.load("textures/Anel_de_Saturno.png");
-const SarturnRingGeometry = new THREE.RingGeometry(11, 15, 100); 
+const SarturnRingGeometry = new THREE.RingGeometry(11, 16.5, 100); 
 const SaturnRingmaterial = new THREE.MeshBasicMaterial({ 
     map: SaturnRingTexture,
     side: THREE.DoubleSide,
@@ -209,6 +243,7 @@ function animate() {
 
     worldMesh.rotation.y += 0.0005;
     cloudMesh.rotation.y -= 0.005;
+    moonOrbit.rotation.y += 0.002;
     marsMesh.rotation.y += 0.0005;
 
     controls.update();
@@ -216,7 +251,6 @@ function animate() {
 }
 
 animate();
-
 
 // teste pra eventos, NÂO ESTÁ FUNCIONANDO
 // window.addEventListener("keydown", (event) => {

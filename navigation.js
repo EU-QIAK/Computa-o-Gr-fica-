@@ -12,8 +12,8 @@ let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(
     30,
     window.innerWidth / window.innerHeight,
-    0.1,
-    2000 // menor far = mais precisão de profundidade
+    0.5,
+    3000 // menor far = mais precisão de profundidade
 );
 camera.position.set(100, 100, 200); // equivalente a (100_000_000, 100_000_000, 200_000_000)
 
@@ -47,6 +47,31 @@ const sunMesh = new THREE.Mesh(sunGeometry, sunMaterial);
 sunMesh.position.set(0, 0, 0);
 scene.add(sunMesh);
 
+// Mercurio
+const MercuryTexture = textureLoader.load("textures/Mercurio.jpg");
+const MercuryGeometry = new THREE.SphereGeometry(0.9, 32, 32);
+const MercuryMaterial = new THREE.MeshBasicMaterial({
+    map: MercuryTexture,
+    depthTest: true,
+    depthWrite: true,
+    transparent: false
+});
+const MercuryMesh = new THREE.Mesh(MercuryGeometry, MercuryMaterial);
+scene.add(MercuryMesh);
+
+// Venus
+const VenusTexture = textureLoader.load("textures/Venus.jpg");
+const VenusGeometry = new THREE.SphereGeometry(0.9, 32, 32);
+const VenusMaterial = new THREE.MeshBasicMaterial({
+    map: VenusTexture,
+    depthTest: true,
+    depthWrite: true,
+    transparent: false
+});
+const VenusMesh = new THREE.Mesh(VenusGeometry, VenusMaterial);
+scene.add(VenusMesh);
+
+
 // Terra
 const worldTexture = textureLoader.load("textures/small-world.jpg");
 const worldGeometry = new THREE.SphereGeometry(0.9, 32, 32);
@@ -58,7 +83,6 @@ const worldMaterial = new THREE.MeshBasicMaterial({
 });
 const worldMesh = new THREE.Mesh(worldGeometry, worldMaterial);
 scene.add(worldMesh);
-
 // Nuvens da Terra
 const cloudTexture = textureLoader.load("textures/small-world-clouds.png");
 const cloudGeometry = new THREE.SphereGeometry(0.905, 32, 32);
@@ -83,29 +107,105 @@ const marsMaterial = new THREE.MeshBasicMaterial({
 const marsMesh = new THREE.Mesh(marsGeometry, marsMaterial);
 scene.add(marsMesh);
 
+// Jupiter 
+const JupiterTexture = textureLoader.load("textures/Jupiter.jpg");
+const JupiterGeometry = new THREE.SphereGeometry(2, 32, 32);
+const JupiterMaterial = new THREE.MeshBasicMaterial({
+    map: JupiterTexture,
+    depthTest: true,
+    depthWrite: true,
+    transparent: false
+});
+const JupiterMesh = new THREE.Mesh(JupiterGeometry, JupiterMaterial);
+scene.add(JupiterMesh);
+
+// Saturno
+const SaturnTexture = textureLoader.load("textures/Saturno.jpg");
+const SaturnGeometry = new THREE.SphereGeometry(2.5, 32, 32);
+const SaturnMaterial = new THREE.MeshBasicMaterial({
+    map: SaturnTexture,
+    depthTest: true,
+    depthWrite: true,
+    transparent: false
+});
+const SaturnMesh = new THREE.Mesh(SaturnGeometry, SaturnMaterial);
+scene.add(SaturnMesh);
+
+// Aneis de Saturno
+const SaturnRingTexture = textureLoader.load("textures/Anel_de_Saturno.png");
+const SarturnRingGeometry = new THREE.RingGeometry(4, 6.5, 128); 
+const SaturnRingmaterial = new THREE.MeshBasicMaterial({ 
+    map: SaturnRingTexture,
+    side: THREE.DoubleSide,
+    depthTest: true,
+    depthWrite: true,
+    transparent: false,
+});
+const SaturnRingMesh = new THREE.Mesh(SarturnRingGeometry, SaturnRingmaterial);
+SaturnRingMesh.rotation.x = -Math.PI / 2;
+scene.add(SaturnRingMesh);
+
+
+// Urano
+const UranoTexture = textureLoader.load("textures/Uranos.jpg");
+const UranoGeometry = new THREE.SphereGeometry(2, 32, 32);
+const UranonMaterial = new THREE.MeshBasicMaterial({
+    map: UranoTexture,
+    depthTest: true,
+    depthWrite: true,
+    transparent: false
+});
+const UranoMesh = new THREE.Mesh(UranoGeometry, UranonMaterial);
+scene.add(UranoMesh);
+
+// Netuno
+const NeptuneTexture = textureLoader.load("textures/Netuno.jpg");
+const NeptuneGeometry = new THREE.SphereGeometry(2, 32, 32);
+const NeptuneMaterial = new THREE.MeshBasicMaterial({
+    map: NeptuneTexture,
+    depthTest: true,
+    depthWrite: true,
+    transparent: false
+});
+const NeptuneMesh = new THREE.Mesh(NeptuneGeometry, NeptuneMaterial);
+scene.add(NeptuneMesh);
+
+
 // OrbitControls
 const controls = new OrbitControls(camera, render.domElement);
 controls.minDistance = 1;
-controls.maxDistance = 1000;
+controls.maxDistance = 1500;
 controls.enableDamping = true;
 
 // Eixos de referência
 scene.add(new THREE.AxesHelper(10));
 
 // malha pra ajudar a localização do eixo
-const gridHelper = new THREE.GridHelper(10000, 1000); 
+const gridHelper = new THREE.GridHelper(10000, 1500); 
 scene.add(gridHelper);
 gridHelper.material.transparent = true;
-gridHelper.material.opacity = 0.3;
+gridHelper.material.opacity = 0.35;
+
+// const gridHelper2 = new THREE.GridHelper(10000, 10000); 
+// scene.add(gridHelper2);
+// gridHelper2.material.transparent = true;
+// gridHelper2.material.opacity = 0.15;
 
 // Loop de animação
 function animate() {
     requestAnimationFrame(animate);
 
     // Rotação e posição dos planetas
-    worldMesh.position.x = 50;
-    cloudMesh.position.x = 50;
-    marsMesh.position.x = 30;
+    MercuryMesh.position.x = 20;
+    VenusMesh.position.x = 30;
+    worldMesh.position.x = 40;
+    cloudMesh.position.x = 40;
+    marsMesh.position.x = 50;
+    JupiterMesh.position.x = 60;
+    SaturnMesh.position.x = 70;
+    UranoMesh.position.x = 80;
+    NeptuneMesh.position.x = 90;
+    SaturnRingMesh.position.x = 70;
 
     worldMesh.rotation.y += 0.0005;
     cloudMesh.rotation.y -= 0.005;

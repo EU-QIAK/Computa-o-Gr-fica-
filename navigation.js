@@ -5,12 +5,20 @@ import { OrbitControls } from "https://esm.sh/three/addons/controls/OrbitControl
 
 const defaultCameraPos = new THREE.Vector3(100, 100, 200);
 const defaultTarget = new THREE.Vector3(0, 0, 0);
-
+var g =1;
 window.addEventListener("keydown", (event) => {
   if (event.key.toLowerCase() === "f") {
+    g+=0.5;
     camera.position.copy(defaultCameraPos);
     controls.target.copy(defaultTarget);
     controls.update();
+  }
+  if(event.key.toLowerCase() === "d"){
+  //  marsObj.rotation.y = 0; //para acelerar/desacelerar individual
+    g-=0.5;  //para todos
+  }
+  if(event.key.toLowerCase() === "r"){
+    g=1;
   }
 });
 
@@ -20,14 +28,22 @@ const SCALE = 1e-6;
 // Cena, câmera, renderizador, controles
 let scene = new THREE.Scene();
 
+const sunLight = new THREE.PointLight(0xffffff, 1, 0, 0);   //luz no centro (que seria o sol)
+scene.add(sunLight);
+
 let camera = new THREE.PerspectiveCamera(
     30,
     window.innerWidth / window.innerHeight,
     0.5,
     3000 // menor far = mais precisão de profundidade
-);
-camera.position.set(100, 100, 200); // equivalente a (100_000_000, 100_000_000, 200_000_000)
 
+);
+camera.position.set(10, 50, 200); // equivalente a (100_000_000, 100_000_000, 200_000_000)
+window.addEventListener("keydown", (event) => {
+if(event.key.toLowerCase() === "c"){
+    camera.position.set(0,50,0);
+  }
+});
 let render = new THREE.WebGLRenderer({ alpha: true, antialias: true });
 render.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(render.domElement);
@@ -37,9 +53,10 @@ const textureLoader = new THREE.TextureLoader();
 
 // Universo (esfera gigante ao redor)
 const universeTexture = textureLoader.load("textures/universe-texture.jpg");
-const universeGeometry = new THREE.SphereGeometry(1000, 32, 32);
-const universeMaterial = new THREE.MeshBasicMaterial({
-    map: universeTexture,
+const universeTexture2 = textureLoader.load("textures/universe-texture1.jpg");
+const universeGeometry = new THREE.SphereGeometry(1000, 1000, 2000);
+const universeMaterial = new THREE.MeshStandardMaterial({
+    map: universeTexture, universeTexture2,
     side: THREE.BackSide
 });
 const universeMesh = new THREE.Mesh(universeGeometry, universeMaterial);
@@ -55,45 +72,83 @@ const sunMaterial = new THREE.MeshBasicMaterial({
     transparent: false
 });
 const sunMesh = new THREE.Mesh(sunGeometry, sunMaterial);
+const sunObj = new THREE.Object3D();
+sunObj.add(sunMesh);
+scene.add(sunObj);
 sunMesh.position.set(0, 0, 0);
-scene.add(sunMesh);
+sunMesh.rotation.y += 0.001; // rotação própria do sol
+
+// teste para um segundo sol para tentar dar um efeito legal no projeto
+const sun2Texture = textureLoader.load("textures/Sol.jpg");
+const sun2Geometry = new THREE.SphereGeometry(10.5, 32, 32);
+const sun2Material = new THREE.MeshBasicMaterial({
+    map: sun2Texture,
+    depthTest: true,
+    depthWrite: true,
+    transparent: true,
+    opacity: 0.5,
+});
+const sun2Mesh = new THREE.Mesh(sun2Geometry, sun2Material);
+const sun2Obj = new THREE.Object3D();
+sun2Obj.add(sun2Mesh);
+scene.add(sun2Obj);
+sun2Mesh.position.set(0, 0, 0);
+sun2Mesh.rotation.y += 0.001; // rotação própria do sol
+
 
 // Mercurio
 const MercuryTexture = textureLoader.load("textures/Mercurio.jpg");
 const MercuryGeometry = new THREE.SphereGeometry(0.38, 32, 32);
-const MercuryMaterial = new THREE.MeshBasicMaterial({
+const MercuryMaterial = new THREE.MeshStandardMaterial({
     map: MercuryTexture,
     depthTest: true,
     depthWrite: true,
     transparent: false
 });
 const MercuryMesh = new THREE.Mesh(MercuryGeometry, MercuryMaterial);
-scene.add(MercuryMesh);
+MercuryMesh.position.set(20, 0, 0); // 20 unidades de distância do Sol
+const MercuryObj = new THREE.Object3D();
+MercuryObj.add(MercuryMesh);
+scene.add(MercuryObj);
+//MercuryMesh.rotation.y += 0.0005; // rotação própria de mercúrio
 
 // Venus
 const VenusTexture = textureLoader.load("textures/Venus.jpg");
 const VenusGeometry = new THREE.SphereGeometry(0.95, 32, 32);
-const VenusMaterial = new THREE.MeshBasicMaterial({
+const VenusMaterial = new THREE.MeshStandardMaterial({
     map: VenusTexture,
     depthTest: true,
     depthWrite: true,
     transparent: false
 });
 const VenusMesh = new THREE.Mesh(VenusGeometry, VenusMaterial);
-scene.add(VenusMesh);
+VenusMesh.position.set(30, 0, 0);  //30 unidades de distancia do sol
+const VenusObj = new THREE.Object3D();
+VenusObj.add(VenusMesh);
+scene.add(VenusObj);
+VenusMesh.rotation.y += -0.0001; // rotação própria de Venus, obs: a rotaçao de venus é ao contrario, por isso o menos
 
+// Terra (Grupo que fará a Terra orbitar o Sol)   chatgpt cantou nessa parte
+const earthOrbit = new THREE.Object3D();
+scene.add(earthOrbit);
+
+// Grupo que contém Terra e nuvens (rotação própria)
+const earthGroup = new THREE.Object3D();
+earthOrbit.add(earthGroup);
 
 // Terra
 const worldTexture = textureLoader.load("textures/small-world.jpg");
 const worldGeometry = new THREE.SphereGeometry(1, 32, 32);
-const worldMaterial = new THREE.MeshBasicMaterial({
+const worldMaterial = new THREE.MeshStandardMaterial({
     map: worldTexture,
     depthTest: true,
     depthWrite: true,
     transparent: false
 });
 const worldMesh = new THREE.Mesh(worldGeometry, worldMaterial);
-scene.add(worldMesh);
+worldMesh.position.set(40, 0, 0); // Distância do Sol
+earthGroup.add(worldMesh);
+
 // Nuvens da Terra
 const cloudTexture = textureLoader.load("textures/small-world-clouds.png");
 const cloudGeometry = new THREE.SphereGeometry(1.05, 32, 32);
@@ -104,106 +159,137 @@ const cloudMaterial = new THREE.MeshBasicMaterial({
     depthWrite: false
 });
 const cloudMesh = new THREE.Mesh(cloudGeometry, cloudMaterial);
-scene.add(cloudMesh);
-// lua
-// Textura da Lua
-const moonTexture = textureLoader.load("textures/Lua.jpg");
+cloudMesh.position.set(40, 0, 0); // Mesma posição da Terra
+earthGroup.add(cloudMesh);
 
-// Grupo de órbita da Lua (orbita a Terra)
+// Grupo da órbita da Lua (ao redor da Terra)
 const moonOrbit = new THREE.Object3D();
-moonOrbit.position.set(40, 0, 0); // Mesmo X da Terra
-scene.add(moonOrbit);
+moonOrbit.position.set(40, 0, 0); // Orbitando a Terra
+earthOrbit.add(moonOrbit); // Lua orbita Terra que orbita Sol
 
-// Criar a Lua
-const moonGeometry = new THREE.SphereGeometry(0.27, 32, 32); // Lua tem ~27% do tamanho da Terra
-const moonMaterial = new THREE.MeshBasicMaterial({
+// Lua
+const moonTexture = textureLoader.load("textures/Lua.jpg");
+const moonGeometry = new THREE.SphereGeometry(0.27, 32, 32);
+const moonMaterial = new THREE.MeshStandardMaterial({
     map: moonTexture,
     depthTest: true,
     depthWrite: true,
     transparent: false
 });
 const moonMesh = new THREE.Mesh(moonGeometry, moonMaterial);
-
-// Posicionar a Lua ao redor da Terra (no raio da órbita)
-moonMesh.position.set(2, 0, 0); // Distância da Terra (2 unidades)
+moonMesh.position.set(2, 0, 0); // Distância da Terra
 moonOrbit.add(moonMesh);
 
 
 // Marte
 const marsTexture = textureLoader.load("textures/Marte.jpg");
 const marsGeometry = new THREE.SphereGeometry(0.60, 32, 32);
-const marsMaterial = new THREE.MeshBasicMaterial({
+const marsMaterial = new THREE.MeshStandardMaterial({
     map: marsTexture,
     depthTest: true,
     depthWrite: true,
     transparent: false
 });
 const marsMesh = new THREE.Mesh(marsGeometry, marsMaterial);
-scene.add(marsMesh);
+marsMesh.position.set(50, 0, 0);
+const marsObj = new THREE.Object3D();
+marsObj.add(marsMesh);
+scene.add(marsObj);
+marsMesh.rotation.y += 0.0008; //rotação própria de Marte
 
-// Jupiter 
+// Jupiter
 const JupiterTexture = textureLoader.load("textures/Jupiter.jpg");
 const JupiterGeometry = new THREE.SphereGeometry(11.2, 32, 32);
-const JupiterMaterial = new THREE.MeshBasicMaterial({
+const JupiterMaterial = new THREE.MeshStandardMaterial({
     map: JupiterTexture,
     depthTest: true,
     depthWrite: true,
     transparent: false
 });
 const JupiterMesh = new THREE.Mesh(JupiterGeometry, JupiterMaterial);
-scene.add(JupiterMesh);
+JupiterMesh.position.set(75,0,0);
+const JupiterObj = new THREE.Object3D();
+JupiterObj.add(JupiterMesh);
+scene.add(JupiterObj);
+JupiterMesh.rotation.y += 0.0025;  //rotação propria de jupiter
 
-// Saturno
+//Saturno
 const SaturnTexture = textureLoader.load("textures/Saturno.jpg");
 const SaturnGeometry = new THREE.SphereGeometry(9.5, 32, 32);
-const SaturnMaterial = new THREE.MeshBasicMaterial({
+const SaturnMaterial = new THREE.MeshStandardMaterial({
     map: SaturnTexture,
     depthTest: true,
     depthWrite: true,
     transparent: false
 });
 const SaturnMesh = new THREE.Mesh(SaturnGeometry, SaturnMaterial);
-scene.add(SaturnMesh);
+SaturnMesh.position.set(0,0,0);
 
-// Aneis de Saturno
+// Textura e mesh dos anéis de Saturno
 const SaturnRingTexture = textureLoader.load("textures/Anel_de_Saturno.png");
-const SarturnRingGeometry = new THREE.RingGeometry(11, 16.5, 100); 
-const SaturnRingmaterial = new THREE.MeshBasicMaterial({ 
+const SaturnRingGeometry = new THREE.CylinderGeometry(
+    16.5, // raio superior
+    11.0, // raio inferior
+    0.1,  // altura (espessura dos anéis)
+    100,  // segmentos radiais
+    1,    // segmentos em altura
+    true  // openEnded = sem tampas
+);
+
+const SaturnRingMaterial = new THREE.MeshStandardMaterial({
     map: SaturnRingTexture,
     side: THREE.DoubleSide,
     depthTest: true,
     depthWrite: true,
-    transparent: false,
+    transparent: true // anel deve ser levemente transparente
 });
-const SaturnRingMesh = new THREE.Mesh(SarturnRingGeometry, SaturnRingmaterial);
-SaturnRingMesh.rotation.x = -Math.PI / 2;
-scene.add(SaturnRingMesh);
 
+const SaturnRingMesh = new THREE.Mesh(SaturnRingGeometry, SaturnRingMaterial);
+SaturnRingMesh.rotation.x = Math.PI / 6;
+SaturnRingMesh.rotation.z = THREE.MathUtils.degToRad(26.7); // inclinação de Saturno real
+SaturnRingMesh.position.set(0, 0, 0);
+
+// Grupo do planeta com seus anéis
+const SaturnObj = new THREE.Object3D();
+SaturnObj.add(SaturnMesh);
+SaturnObj.add(SaturnRingMesh);
+SaturnObj.position.set(0, 0, 0); // posição em relação ao Sol
+
+// Grupo da órbita (translação)
+const SaturnOrbit = new THREE.Object3D();
+SaturnOrbit.add(SaturnObj);
+scene.add(SaturnOrbit);
 
 // Urano
 const UranoTexture = textureLoader.load("textures/Uranos.jpg");
 const UranoGeometry = new THREE.SphereGeometry(4, 32, 32);
-const UranonMaterial = new THREE.MeshBasicMaterial({
+const UranonMaterial = new THREE.MeshStandardMaterial({
     map: UranoTexture,
     depthTest: true,
     depthWrite: true,
     transparent: false
 });
 const UranoMesh = new THREE.Mesh(UranoGeometry, UranonMaterial);
-scene.add(UranoMesh);
+const UranoOrbit = new THREE.Object3D();
+scene.add(UranoOrbit);
+UranoMesh.position.set(75, 0, 0);
+UranoOrbit.add(UranoMesh);
 
 // Netuno
 const NeptuneTexture = textureLoader.load("textures/Netuno.jpg");
 const NeptuneGeometry = new THREE.SphereGeometry(3.88, 32, 32);
-const NeptuneMaterial = new THREE.MeshBasicMaterial({
+const NeptuneMaterial = new THREE.MeshStandardMaterial({
     map: NeptuneTexture,
     depthTest: true,
     depthWrite: true,
     transparent: false
 });
 const NeptuneMesh = new THREE.Mesh(NeptuneGeometry, NeptuneMaterial);
-scene.add(NeptuneMesh);
-
+const NeptuneObj = new THREE.Object3D();
+NeptuneObj.add(NeptuneMesh);
+NeptuneObj.position.set(0,0,0);
+scene.add(NeptuneObj);
+NeptuneMesh.rotation.y += 0.4;  //rotação propria de netuno
 
 // OrbitControls
 const controls = new OrbitControls(camera, render.domElement);
@@ -215,12 +301,12 @@ controls.enableDamping = true;
 scene.add(new THREE.AxesHelper(10));
 
 // malha pra ajudar a localização do eixo
-const gridHelper = new THREE.GridHelper(10000, 1500); 
-scene.add(gridHelper);
-gridHelper.material.transparent = true;
-gridHelper.material.opacity = 0.2;
+// const gridHelper = new THREE.GridHelper(10000, 1500);
+// scene.add(gridHelper);
+// gridHelper.material.transparent = true;
+// gridHelper.material.opacity = 0.1;
 
-// const gridHelper2 = new THREE.GridHelper(10000, 10000); 
+// const gridHelper2 = new THREE.GridHelper(10000, 10000);
 // scene.add(gridHelper2);
 // gridHelper2.material.transparent = true;
 // gridHelper2.material.opacity = 0.15;
@@ -230,8 +316,24 @@ function animate() {
     requestAnimationFrame(animate);
 
     // Rotação e posição dos planetas
+    //sunMesh.rotation.y += 0.001;
+    MercuryMesh.rotation.y += 0.0005;
+    MercuryObj.rotation.y += 0.0047*g;
+   // VenusMesh.rotation.y += -0.0001;
+    VenusObj.rotation.y += 0.0035*g;
+    //marsMesh.rotation.y += 0.0008;
+    marsObj.rotation.y += 0.0005*g;
+    VenusMesh.rotation.y += -0.0001;
+    VenusObj.rotation.y += 0.0012*g;
+    //JupiterMesh.rotation.y += 0.0025;
+    JupiterObj.rotation.y += 0.0002*g;
+    SaturnMesh.rotation.y += 0.0025;
+    SaturnObj.rotation.y += 0.00010*g;
+    UranoMesh.rotation.y += -0.002;
+    UranoOrbit.rotation.y += -0.00007*g;
+    //NeptuneMesh.rotation.y += 0.002;
+    NeptuneObj.rotation.y += 0.00003*g;
     MercuryMesh.position.x = 20;
-    VenusMesh.position.x = 30;
     worldMesh.position.x = 40;
     cloudMesh.position.x = 40;
     marsMesh.position.x = 50;
@@ -240,10 +342,10 @@ function animate() {
     SaturnRingMesh.position.x = 115;
     UranoMesh.position.x = 150;
     NeptuneMesh.position.x = 180;
-
     worldMesh.rotation.y += 0.0005;
     cloudMesh.rotation.y -= 0.005;
-    moonOrbit.rotation.y += 0.002;
+    earthOrbit.rotation.y += 0.001*g;
+    moonOrbit.rotation.y += 0.002*g;
     marsMesh.rotation.y += 0.0005;
 
     controls.update();
@@ -251,13 +353,3 @@ function animate() {
 }
 
 animate();
-
-// teste pra eventos, NÂO ESTÁ FUNCIONANDO
-// window.addEventListener("keydown", (event) => {
-//   if (event.key.toLowerCase() === "f") {
-//     // Resetar posição e alvo
-//     camera.position.copy(defaultCameraPos);
-//     controls.target.copy(defaultTarget);
-//     controls.update();
-//   }
-// });

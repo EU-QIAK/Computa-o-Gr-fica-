@@ -1,11 +1,54 @@
 import * as THREE from 'https://unpkg.com/three@0.155.0/build/three.module.js';
 import { OrbitControls } from "https://esm.sh/three/addons/controls/OrbitControls.js";
 
-// ATUALIZAÇÂO 1.0.5 CHAT DEU UMA SALVADA NAS PROPORÇÕES
+// ATUALIZAÇÂO 1.2.0 quase mec
 
+// fazendo aparecer uma linha branca nos planetas quando passar o mouse
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+let pulseTime = 0;
+
+function createOutline(mesh) {
+    const outlineMaterial = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        side: THREE.BackSide,
+        transparent: true,
+        opacity: 0.8
+    });
+    const outline = new THREE.Mesh(mesh.geometry.clone(), outlineMaterial);
+    outline.scale.multiplyScalar(1.1);
+    mesh.add(outline);
+    return outline;
+}
+
+window.addEventListener("mousemove", (event) => {
+    const rect = render.domElement.getBoundingClientRect();
+    mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(planetObjects);
+
+    if (intersects.length > 0) {
+        const hovered = intersects[0].object;
+        const name = planetNames[hovered.uuid];
+        if (name) {
+            tooltip.innerText = name;
+            tooltip.style.left = event.clientX + 10 + "px";
+            tooltip.style.top = event.clientY + 10 + "px";
+            tooltip.style.display = "block";
+        }
+    } else {
+        tooltip.style.display = "none";
+    }
+});
+
+// constantes para ajudar nos eeventos
 const defaultCameraPos = new THREE.Vector3(40, 60, 370);
 const defaultTarget = new THREE.Vector3(0, 0, 0);
 var g =1;
+
+// comandos
 window.addEventListener("keydown", (event) => {
   if (event.key.toLowerCase() === "f") {
     g+=0.5;
@@ -28,7 +71,8 @@ const SCALE = 1e-6;
 // Cena, câmera, renderizador, controles
 let scene = new THREE.Scene();
 
-const sunLight = new THREE.PointLight(0xffffff, 1.5, 0, 0);   //luz no centro (que seria o sol)
+//luz no centro (que seria o sol)
+const sunLight = new THREE.PointLight(0xffffff, 1.5, 0, 0); 
 scene.add(sunLight);
 
 let camera = new THREE.PerspectiveCamera(
@@ -38,7 +82,7 @@ let camera = new THREE.PerspectiveCamera(
     3000 // menor far = mais precisão de profundidade
 
 );
-camera.position.set(40, 60, 370); // equivalente a (100_000_000, 100_000_000, 200_000_000)
+camera.position.set(40, 60, 370); // começa em um frame legalzin
 
 window.addEventListener("keydown", (event) => {
     const key = event.key.toLowerCase();
@@ -72,6 +116,7 @@ window.addEventListener("keydown", (event) => {
     return;
             
     }
+
 camera.position.set(target.x + 30, target.y + 20, target.z + 30);
  controls.target.copy(target);
 controls.update();
@@ -333,6 +378,33 @@ controls.enableDamping = true;
 // Eixos de referência
 scene.add(new THREE.AxesHelper(10));
 
+// Criação dos contornos (silhuetas)
+MercuryMesh.userData.outline = createOutline(MercuryMesh);
+VenusMesh.userData.outline = createOutline(VenusMesh);
+worldMesh.userData.outline = createOutline(worldMesh);
+marsMesh.userData.outline = createOutline(marsMesh);
+JupiterMesh.userData.outline = createOutline(JupiterMesh);
+SaturnMesh.userData.outline = createOutline(SaturnMesh);
+UranoMesh.userData.outline = createOutline(UranoMesh);
+NeptuneMesh.userData.outline = createOutline(NeptuneMesh);
+
+// mostrando os nomes dos planetas
+const tooltip = document.getElementById('tooltip');
+const planetObjects = [
+    MercuryMesh, VenusMesh, worldMesh, marsMesh,
+    JupiterMesh, SaturnMesh, UranoMesh, NeptuneMesh
+];
+const planetNames = {
+    [MercuryMesh.uuid]: "1° - Mercúrio",
+    [VenusMesh.uuid]: "2° - Vênus",
+    [worldMesh.uuid]: "3° - Terra",
+    [marsMesh.uuid]: "4° - Marte",
+    [JupiterMesh.uuid]: "5° - Júpiter",
+    [SaturnMesh.uuid]: "6° - Saturno",
+    [UranoMesh.uuid]: "7° - Urano",
+    [NeptuneMesh.uuid]: "8° - Netuno"
+};
+
 // malha pra ajudar a localização do eixo
 // const gridHelper = new THREE.GridHelper(10000, 1500);
 // scene.add(gridHelper);
@@ -429,6 +501,24 @@ function animate() {
     marsMesh.rotation.y += 0.0005;
 
     controls.update();
+
+   // Atualiza silhueta (efeito pulsar)
+    pulseTime += 0.05;
+    planetObjects.forEach(p => {
+    if (p.userData.outline) {
+        p.userData.outline.visible = false;
+        p.userData.outline.scale.setScalar(1.1 + Math.sin(pulseTime) * 0.05);
+    }
+    });
+
+    const intersects = raycaster.intersectObjects(planetObjects);
+    if (intersects.length > 0) {
+        const hovered = intersects[0].object;
+        if (hovered.userData.outline) {
+            hovered.userData.outline.visible = true;
+        }
+    }
+
     render.render(scene, camera);
 }
 

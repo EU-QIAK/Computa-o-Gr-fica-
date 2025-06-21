@@ -1,6 +1,5 @@
 
-
-    HTML CSS JS 
+HTML CSS JS 
 
     Result
     Skip Results Iframe
@@ -16,7 +15,7 @@ EDIT ON
   top: 3%;
   left: 35%;
   right: 35%;
-  background-color: rgba(200, 200, 200, 0.65); /* cinza claro translúcido */
+  background-color: hsla(0, 0%, 93%, 0.65); /* cinza claro translúcido */
   color: #000;
   text-align: center;
   font-family: sans-serif;
@@ -121,4 +120,17 @@ EDIT ON
 
 #meuLink a:hover {
   text-decoration: underline;
+}
+
+#tooltip {
+    position: absolute;
+    background: rgba(255,255,255,0.9);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-family: sans-serif;
+    font-size: 13px;
+    pointer-events: none;
+    color: #000;
+    display: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }

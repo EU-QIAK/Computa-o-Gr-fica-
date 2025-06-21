@@ -12,20 +12,20 @@ EDIT ON
 }
 
 #info {
-  position: absolute;
-  top: 0px;
-  width: 100%;
-  padding: 3rem;
-  box-sizing: border-box;
+  position: fixed;
+  top: 3%;
+  left: 35%;
+  right: 35%;
+  background-color: rgba(200, 200, 200, 0.65); /* cinza claro translúcido */
+  color: #000;
   text-align: center;
-  -moz-user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  pointer-events: none;
-  z-index: 1;
-  color: rgb(255, 208, 0);
-  font-family: monospace;
+  font-family: sans-serif;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 12px 18px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  z-index: 9999;
 }
 
 #dropdown {
@@ -71,4 +71,54 @@ EDIT ON
 
 #dropdown:hover #dropdown-content {
   display: block;
+}
+
+#commandHelp {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 220px;
+  background-color: rgba(200, 200, 200, 0.65); /* cinza claro translúcido */
+  color: #000;
+  font-family: sans-serif;
+  font-size: 14px;
+  padding: 15px;
+  border-radius: 10px;
+  z-index: 9999;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+#commandHelp h3 {
+  margin-top: 0;
+  font-size: 16px;
+  border-bottom: 1px solid #444;
+  padding-bottom: 5px;
+}
+
+#commandHelp ul {
+  padding-left: 18px;
+  margin: 10px 0 0 0;
+}
+
+#meuLink {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background-color: rgba(200, 200, 200, 0.65);
+  padding: 10px 15px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  font-family: sans-serif;
+  font-size: 12px;
+  z-index: 9999;
+}
+
+#meuLink a {
+  color: #000;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+#meuLink a:hover {
+  text-decoration: underline;
 }

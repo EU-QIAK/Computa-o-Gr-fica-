@@ -3,7 +3,7 @@ import { OrbitControls } from "https://esm.sh/three/addons/controls/OrbitControl
 
 // ATUALIZAÇÂO 1.0.5 CHAT DEU UMA SALVADA NAS PROPORÇÕES
 
-const defaultCameraPos = new THREE.Vector3(100, 100, 200);
+const defaultCameraPos = new THREE.Vector3(40, 60, 370);
 const defaultTarget = new THREE.Vector3(0, 0, 0);
 var g =1;
 window.addEventListener("keydown", (event) => {
@@ -28,7 +28,7 @@ const SCALE = 1e-6;
 // Cena, câmera, renderizador, controles
 let scene = new THREE.Scene();
 
-const sunLight = new THREE.PointLight(0xffffff, 1, 0, 0);   //luz no centro (que seria o sol)
+const sunLight = new THREE.PointLight(0xffffff, 1.5, 0, 0);   //luz no centro (que seria o sol)
 scene.add(sunLight);
 
 let camera = new THREE.PerspectiveCamera(
@@ -38,11 +38,44 @@ let camera = new THREE.PerspectiveCamera(
     3000 // menor far = mais precisão de profundidade
 
 );
-camera.position.set(10, 50, 200); // equivalente a (100_000_000, 100_000_000, 200_000_000)
+camera.position.set(40, 60, 370); // equivalente a (100_000_000, 100_000_000, 200_000_000)
+
 window.addEventListener("keydown", (event) => {
-if(event.key.toLowerCase() === "c"){
-    camera.position.set(0,50,0);
-  }
+    const key = event.key.toLowerCase();
+    const target = new THREE.Vector3();
+    switch(key) {
+        case '1' : //Mercúrio
+        MercuryMesh.getWorldPosition(target);
+        break;
+        case '2': //Vênus
+        VenusMesh.getWorldPosition(target);
+        break;
+        case '3': //Terra
+        earthGroup.getWorldPosition(target);
+        break;
+        case '4': //Marte
+        marsMesh.getWorldPosition(target);
+        break;
+        case '5': //júpiter
+        JupiterMesh.getWorldPosition(target);
+        break;
+        case '6': //Saturno
+        SaturnMesh.getWorldPosition(target);
+        break;
+        case '7': // Urano
+      UranoMesh.getWorldPosition(target);
+      break;
+        case '8': // Netuno
+      NeptuneMesh.getWorldPosition(target);
+         break;
+    default:
+    return;
+            
+    }
+camera.position.set(target.x + 30, target.y + 20, target.z + 30);
+ controls.target.copy(target);
+controls.update();
+
 });
 let render = new THREE.WebGLRenderer({ alpha: true, antialias: true });
 render.setSize(window.innerWidth, window.innerHeight);
@@ -78,15 +111,15 @@ scene.add(sunObj);
 sunMesh.position.set(0, 0, 0);
 sunMesh.rotation.y += 0.001; // rotação própria do sol
 
-// teste para um segundo sol para tentar dar um efeito legal no projeto
+// segundo sol para tentar dar um efeito legal no projeto
 const sun2Texture = textureLoader.load("textures/Sol.jpg");
-const sun2Geometry = new THREE.SphereGeometry(10.5, 32, 32);
+const sun2Geometry = new THREE.SphereGeometry(10.3, 32, 32);
 const sun2Material = new THREE.MeshBasicMaterial({
     map: sun2Texture,
     depthTest: true,
     depthWrite: true,
     transparent: true,
-    opacity: 0.5,
+    opacity: 0.3,
 });
 const sun2Mesh = new THREE.Mesh(sun2Geometry, sun2Material);
 const sun2Obj = new THREE.Object3D();
@@ -311,27 +344,74 @@ scene.add(new THREE.AxesHelper(10));
 // gridHelper2.material.transparent = true;
 // gridHelper2.material.opacity = 0.15;
 
+// tentando criar as linhas das orbitas dos planetas
+function createOrbitLine(radius, segments = 128, color = 0xffffff) {
+    const points = [];
+    for (let i = 0; i <= segments; i++) {
+        const theta = (i / segments) * Math.PI * 2;
+        points.push(new THREE.Vector3(
+            Math.cos(theta) * radius,
+            0,
+            Math.sin(theta) * radius
+        ));
+    }
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    const material = new THREE.LineBasicMaterial({
+        color: color,
+        transparent: true,
+        opacity: 0.2
+    });
+    return new THREE.LineLoop(geometry, material);
+}
+
+// Orbita de Mercúrio
+const orbitMercury = createOrbitLine(20, 128, 0xaaaaaa);
+scene.add(orbitMercury);
+
+// Orbita de Vênus
+const orbitVenus = createOrbitLine(30, 128, 0xffaa88);
+scene.add(orbitVenus);
+
+// Orbita da Terra
+const orbitEarth = createOrbitLine(40, 128, 0x00aaff);
+scene.add(orbitEarth);
+
+// Orbita de Marte
+const orbitMars = createOrbitLine(50, 128, 0xff5533);
+scene.add(orbitMars);
+
+// Orbita de Júpiter
+const orbitJupiter = createOrbitLine(75, 128, 0xffddaa);
+scene.add(orbitJupiter);
+
+// Orbita de Saturno
+const orbitSaturn = createOrbitLine(115, 128, 0xffeecc);
+scene.add(orbitSaturn);
+
+// Orbita de Urano
+const orbitUranus = createOrbitLine(150, 128, 0xaaffff);
+scene.add(orbitUranus);
+
+// Orbita de Netuno
+const orbitNeptune = createOrbitLine(180, 128, 0x8899ff);
+scene.add(orbitNeptune);
+
 // Loop de animação
 function animate() {
     requestAnimationFrame(animate);
 
     // Rotação e posição dos planetas
-    //sunMesh.rotation.y += 0.001;
     MercuryMesh.rotation.y += 0.0005;
     MercuryObj.rotation.y += 0.0047*g;
-   // VenusMesh.rotation.y += -0.0001;
     VenusObj.rotation.y += 0.0035*g;
-    //marsMesh.rotation.y += 0.0008;
     marsObj.rotation.y += 0.0005*g;
     VenusMesh.rotation.y += -0.0001;
     VenusObj.rotation.y += 0.0012*g;
-    //JupiterMesh.rotation.y += 0.0025;
     JupiterObj.rotation.y += 0.0002*g;
     SaturnMesh.rotation.y += 0.0025;
     SaturnObj.rotation.y += 0.00010*g;
     UranoMesh.rotation.y += -0.002;
     UranoOrbit.rotation.y += -0.00007*g;
-    //NeptuneMesh.rotation.y += 0.002;
     NeptuneObj.rotation.y += 0.00003*g;
     MercuryMesh.position.x = 20;
     worldMesh.position.x = 40;

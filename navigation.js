@@ -458,16 +458,18 @@ const planetObjects = [
     MercuryMesh, VenusMesh, worldMesh, marsMesh,
     JupiterMesh, SaturnMesh, UranoMesh, NeptuneMesh
 ];
+
 const planetNames = {
-    [MercuryMesh.uuid]: "1° - Mercúrio",
-    [VenusMesh.uuid]: "2° - Vênus",
-    [worldMesh.uuid]: "3° - Terra",
-    [marsMesh.uuid]: "4° - Marte",
-    [JupiterMesh.uuid]: "5° - Júpiter",
-    [SaturnMesh.uuid]: "6° - Saturno",
-    [UranoMesh.uuid]: "7° - Urano",
-    [NeptuneMesh.uuid]: "8° - Netuno"
+    [MercuryMesh.uuid]: "1° - Mercúrio:\nO menor planeta e o mais\npróximo do Sol. Não possui\natmosfera significativa e tem\nvariações extremas de temperatura.",
+    [VenusMesh.uuid]: "2° - Vênus:\nSemelhante em tamanho à Terra,\nmas com atmosfera densa e quente\ndebido ao efeito estufa intenso.",
+    [worldMesh.uuid]: "3° - Terra:\nNosso lar. O único planeta com\nvida conhecida. Possui água líquida\ne atmosfera rica em oxigênio.",
+    [marsMesh.uuid]: "4° - Marte:\nChamado de 'planeta vermelho'.\nTem calotas polares, montanhas\ngigantes e sinais de água antiga.",
+    [JupiterMesh.uuid]: "5° - Júpiter:\nO maior planeta do Sistema Solar.\nGigante gasoso com uma Grande\nMancha Vermelha e muitas luas.",
+    [SaturnMesh.uuid]: "6° - Saturno:\nFamoso por seus anéis feitos de\ngelo e poeira. Também possui\nmuitas luas ao seu redor.",
+    [UranoMesh.uuid]: "7° - Urano:\nGigante gelado com coloração\nazul-esverdeada. Gira quase\ndeitado em relação ao Sol.",
+    [NeptuneMesh.uuid]: "8° - Netuno:\nO mais distante do Sol.\nPossui ventos poderosos e\numa atmosfera azul intensa."
 };
+
 
 // tentando criar as linhas das orbitas dos planetas
 function createOrbitLine(radius, segments = 128, color = 0xffffff) {

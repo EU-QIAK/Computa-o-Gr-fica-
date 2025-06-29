@@ -1,7 +1,7 @@
 import * as THREE from 'https://unpkg.com/three@0.155.0/build/three.module.js';
 import { OrbitControls } from "https://esm.sh/three/addons/controls/OrbitControls.js";
 
-// ATUALIZAÇÂO 1.2.0 quase mec
+// ATUALIZAÇÂO 1.5.1 
 
 // fazendo aparecer uma linha branca nos planetas quando passar o mouse
 const raycaster = new THREE.Raycaster();
@@ -46,7 +46,7 @@ window.addEventListener("mousemove", (event) => {
 // constantes para ajudar nos eventos
 const defaultCameraPos = new THREE.Vector3(40, 60, 370);
 const defaultTarget = new THREE.Vector3(0, 0, 0);
-var g =1;
+var g = 1;
 
 // comandos
 window.addEventListener("keydown", (event) => {
@@ -57,7 +57,6 @@ window.addEventListener("keydown", (event) => {
     controls.update();
   }
   if(event.key.toLowerCase() === "d"){
-  //  marsObj.rotation.y = 0; //para acelerar/desacelerar individual
     g-=0.5;  //para todos
   }
   if(event.key.toLowerCase() === "r"){
@@ -79,7 +78,7 @@ let camera = new THREE.PerspectiveCamera(
     30,
     window.innerWidth / window.innerHeight,
     0.5,
-    3000 // menor far = mais precisão de profundidade
+    3000 
 
 );
 camera.position.set(40, 60, 370); // começa em um frame legalzin
@@ -251,6 +250,7 @@ const cloudGeometry = new THREE.SphereGeometry(1.05, 32, 32);
 const cloudMaterial = new THREE.MeshBasicMaterial({
     map: cloudTexture,
     transparent: true,
+    opacity: 0.8,
     depthTest: true,
     depthWrite: false
 });
@@ -293,14 +293,12 @@ marsObj.add(marsMesh);
 scene.add(marsObj);
 marsMesh.rotation.y += 0.0008; //rotação própria de Marte
 
-// Adicione antes de adicionar Fobos e Deimos
 const MarsGroup = new THREE.Object3D();
 
 const marsOrbit = new THREE.Object3D();
 marsOrbit.add(MarsGroup);
 scene.add(marsOrbit);
 
-// Depois, adicione Marte no centro do grupo:
 MarsGroup.add(marsObj); // assim marte e suas luas giram juntos
 
 // Órbita de Fobos ao redor de Marte
@@ -386,7 +384,7 @@ const SaturnRingMaterial = new THREE.MeshStandardMaterial({
     side: THREE.DoubleSide,
     depthTest: true,
     depthWrite: true,
-    transparent: true // anel deve ser levemente transparente
+    transparent: true // anel levemente transparente
 });
 
 const SaturnRingMesh = new THREE.Mesh(SaturnRingGeometry, SaturnRingMaterial);
@@ -473,18 +471,7 @@ const planetNames = {
     [NeptuneMesh.uuid]: "8° - Netuno:\nO mais distante do Sol.\nPossui ventos poderosos e\numa atmosfera azul intensa."
 };
 
-// malha pra ajudar a localização do eixo
-// const gridHelper = new THREE.GridHelper(10000, 1500);
-// scene.add(gridHelper);
-// gridHelper.material.transparent = true;
-// gridHelper.material.opacity = 0.1;
-
-// const gridHelper2 = new THREE.GridHelper(10000, 10000);
-// scene.add(gridHelper2);
-// gridHelper2.material.transparent = true;
-// gridHelper2.material.opacity = 0.15;
-
-// tentando criar as linhas das orbitas dos planetas
+// criando as linhas das orbitas dos planetas
 function createOrbitLine(radius, segments = 128, color = 0xffffff) {
     const points = [];
     for (let i = 0; i <= segments; i++) {
@@ -607,35 +594,31 @@ function animate() {
     render.render(scene, camera);
 
     // Translação da Terra
-earthOrbit.rotation.y += 0.001 * g;
+    earthOrbit.rotation.y += 0.001 * g;
 
-// Normaliza a rotação atual entre 0 e 2π
-const normalizedRotation = (earthOrbit.rotation.y % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+    // Normaliza a rotação atual entre 0 e 2π
+    const normalizedRotation = (earthOrbit.rotation.y % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
 
-// Detecta a passagem pela origem
-if (!passouPorZero && normalizedRotation < 0.1) {
-    if (g > 0) {
-        earthYears += 1;
-    } else if (g < 0) {
-        earthYears -= 1;
+    // Detecta a passagem pela origem
+    if (!passouPorZero && normalizedRotation < 0.1) {
+        if (g > 0) {
+            earthYears += 1;
+        } else if (g < 0) {
+            earthYears -= 1;
+        }
+        console.log(`Ano ${earthYears}`);
+        passouPorZero = true;
     }
-    console.log(`Ano ${earthYears}`);
-    passouPorZero = true;
-}
 
-// Libera a trava depois que já passou bem longe do zero
-if (normalizedRotation > 1.0) {
-    passouPorZero = false;
-}
+    // Libera a trava depois que já passou bem longe do zero
+    if (normalizedRotation > 1.0) {
+        passouPorZero = false;
+    }
 
+    // Atualiza valor antigo para próxima comparação
+    lastEarthRotation = earthOrbit.rotation.y;
 
-
-
-
-// Atualiza valor antigo para próxima comparação
-lastEarthRotation = earthOrbit.rotation.y;
-
-document.getElementById('year-counter').textContent = `Ano: ${earthYears}`;
+    document.getElementById('year-counter').textContent = `Ano: ${earthYears}`;
 
 }
 

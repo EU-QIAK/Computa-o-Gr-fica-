@@ -43,7 +43,6 @@ window.addEventListener("mousemove", (event) => {
     }
 });
 
-
 // constantes para ajudar nos eventos
 const defaultCameraPos = new THREE.Vector3(40, 60, 370);
 const defaultTarget = new THREE.Vector3(0, 0, 0);
@@ -84,9 +83,7 @@ let camera = new THREE.PerspectiveCamera(
 
 );
 camera.position.set(40, 60, 370); // começa em um frame legalzin
-
 let positionatual = null;
-
 window.addEventListener("keydown", (event) => {
     const key = event.key.toLowerCase();
     const target = new THREE.Vector3();
@@ -251,10 +248,9 @@ earthGroup.add(worldMesh);
 // Nuvens da Terra
 const cloudTexture = textureLoader.load("textures/small-world-clouds.png");
 const cloudGeometry = new THREE.SphereGeometry(1.05, 32, 32);
-const cloudMaterial = new THREE.MeshStandardMaterial({
+const cloudMaterial = new THREE.MeshBasicMaterial({
     map: cloudTexture,
     transparent: true,
-    opacity: 0.7,
     depthTest: true,
     depthWrite: false
 });
@@ -266,6 +262,7 @@ earthGroup.add(cloudMesh);
 const moonOrbit = new THREE.Object3D();
 moonOrbit.position.set(40, 0, 0); // Orbitando a Terra
 earthOrbit.add(moonOrbit); // Lua orbita Terra que orbita Sol
+earthOrbit.rotation.y += 0.001*g;
 
 // Lua
 const moonTexture = textureLoader.load("textures/Lua.jpg");
@@ -280,16 +277,6 @@ const moonMesh = new THREE.Mesh(moonGeometry, moonMaterial);
 moonMesh.position.set(2, 0, 0); // Distância da Terra
 moonOrbit.add(moonMesh);
 
-
-// Marte
-// Órbita de Marte em torno do Sol
-const MarsOrbit = new THREE.Object3D();
-scene.add(MarsOrbit);
-
-// Grupo que contém Marte e Fobos (rotação própria de Marte)
-const MarsGroup = new THREE.Object3D();
-MarsOrbit.add(MarsGroup);
-
 // Marte
 const marsTexture = textureLoader.load("textures/Marte.jpg");
 const marsGeometry = new THREE.SphereGeometry(0.60, 32, 32);
@@ -300,8 +287,21 @@ const marsMaterial = new THREE.MeshStandardMaterial({
     transparent: false
 });
 const marsMesh = new THREE.Mesh(marsGeometry, marsMaterial);
-marsMesh.position.set(50, 0, 0); // Distância do Sol
-MarsGroup.add(marsMesh);
+marsMesh.position.set(50, 0, 0);
+const marsObj = new THREE.Object3D();
+marsObj.add(marsMesh);
+scene.add(marsObj);
+marsMesh.rotation.y += 0.0008; //rotação própria de Marte
+
+// Adicione antes de adicionar Fobos e Deimos
+const MarsGroup = new THREE.Object3D();
+
+const marsOrbit = new THREE.Object3D();
+marsOrbit.add(MarsGroup);
+scene.add(marsOrbit);
+
+// Depois, adicione Marte no centro do grupo:
+MarsGroup.add(marsObj); // assim marte e suas luas giram juntos
 
 // Órbita de Fobos ao redor de Marte
 const FobosOrbit = new THREE.Object3D();
@@ -309,9 +309,10 @@ FobosOrbit.position.set(50, 0, 0); // mesma posição de Marte
 MarsGroup.add(FobosOrbit);
 
 // Fobos (lua de Marte)
-const FobosTexture = textureLoader.load("textures/Lua.jpg"); // ou use outra textura se tiver
-const FobosGeometry = new THREE.SphereGeometry(0.15, 32, 32); // menor que a Lua da Terra
+const FobosTexture = textureLoader.load("textures/Lua.jpg");
+const FobosGeometry = new THREE.SphereGeometry(0.15, 32, 32);
 const FobosMaterial = new THREE.MeshStandardMaterial({
+    map: FobosTexture,
     map: FobosTexture,
     depthTest: true,
     depthWrite: true,
@@ -327,10 +328,11 @@ DeimosOrbit.position.set(50, 0, 0); // mesma posição de Marte
 MarsGroup.add(DeimosOrbit);
 
 // Deimos (segunda lua de Marte)
-const DeimosTexture = textureLoader.load("textures/Lua.jpg"); // você pode trocar por uma textura própria se quiser
-const DeimosGeometry = new THREE.SphereGeometry(0.10, 32, 32); // menor que Fobos
+const DeimosTexture = textureLoader.load("textures/Lua.jpg");
+const DeimosGeometry = new THREE.SphereGeometry(0.10, 32, 32);
 const DeimosMaterial = new THREE.MeshStandardMaterial({
     map: DeimosTexture,
+map: FobosTexture,
     depthTest: true,
     depthWrite: true,
     transparent: false
@@ -338,6 +340,7 @@ const DeimosMaterial = new THREE.MeshStandardMaterial({
 const DeimosMesh = new THREE.Mesh(DeimosGeometry, DeimosMaterial);
 DeimosMesh.position.set(2.3, 0, 0); // um pouco mais longe que Fobos
 DeimosOrbit.add(DeimosMesh);
+
 
 // Jupiter
 const JupiterTexture = textureLoader.load("textures/Jupiter.jpg");
@@ -461,7 +464,7 @@ const planetObjects = [
 
 const planetNames = {
     [MercuryMesh.uuid]: "1° - Mercúrio:\nO menor planeta e o mais\npróximo do Sol. Não possui\natmosfera significativa e tem\nvariações extremas de temperatura.",
-    [VenusMesh.uuid]: "2° - Vênus:\nSemelhante em tamanho à Terra,\nmas com atmosfera densa e quente\ndebido ao efeito estufa intenso.",
+    [VenusMesh.uuid]: "2° - Vênus:\nSemelhante em tamanho à Terra,\nmas com atmosfera densa e quente\ndevido ao efeito estufa intenso.",
     [worldMesh.uuid]: "3° - Terra:\nNosso lar. O único planeta com\nvida conhecida. Possui água líquida\ne atmosfera rica em oxigênio.",
     [marsMesh.uuid]: "4° - Marte:\nChamado de 'planeta vermelho'.\nTem calotas polares, montanhas\ngigantes e sinais de água antiga.",
     [JupiterMesh.uuid]: "5° - Júpiter:\nO maior planeta do Sistema Solar.\nGigante gasoso com uma Grande\nMancha Vermelha e muitas luas.",
@@ -470,6 +473,16 @@ const planetNames = {
     [NeptuneMesh.uuid]: "8° - Netuno:\nO mais distante do Sol.\nPossui ventos poderosos e\numa atmosfera azul intensa."
 };
 
+// malha pra ajudar a localização do eixo
+// const gridHelper = new THREE.GridHelper(10000, 1500);
+// scene.add(gridHelper);
+// gridHelper.material.transparent = true;
+// gridHelper.material.opacity = 0.1;
+
+// const gridHelper2 = new THREE.GridHelper(10000, 10000);
+// scene.add(gridHelper2);
+// gridHelper2.material.transparent = true;
+// gridHelper2.material.opacity = 0.15;
 
 // tentando criar as linhas das orbitas dos planetas
 function createOrbitLine(radius, segments = 128, color = 0xffffff) {
@@ -524,27 +537,34 @@ const orbitNeptune = createOrbitLine(180, 128, 0x8899ff);
 scene.add(orbitNeptune);
 
 // Loop de animação
+let passouPorZero = true;
+
 function animate() {
     requestAnimationFrame(animate);
 
     // Rotação e posição dos planetas
-    MercuryMesh.rotation.y += 0.0005;
+    MercuryMesh.rotation.y += 0.001;
     MercuryObj.rotation.y += 0.0047*g;
     VenusObj.rotation.y += 0.0035*g;
+    VenusMesh.rotation.y += -0.001;
+    marsOrbit.rotation.y += 0.0005 * g;
+    marsMesh.rotation.y += 0.007;
     VenusMesh.rotation.y += -0.0001;
     JupiterObj.rotation.y += 0.0002*g;
+    JupiterMesh.rotation.y += 0.003;
     SaturnMesh.rotation.y += 0.0025;
     SaturnObj.rotation.y += 0.00010*g;
     UranoMesh.rotation.y += -0.002;
     UranoOrbit.rotation.y += -0.00007*g;
     NeptuneObj.rotation.y += 0.00003*g;
+    NeptuneMesh.rotation.y += 0.002;
     cloudMesh.rotation.y -= 0.005;
-    earthOrbit.rotation.y += 0.001*g;
+    worldMesh.rotation.y += 0.002;
     moonOrbit.rotation.y += 0.002*g;
     marsMesh.rotation.y += 0.0005;
-    MarsOrbit.rotation.y += 0.0008 * g;  
-    FobosOrbit.rotation.y += 0.01 * g;   
-    DeimosOrbit.rotation.y += 0.006 * g;  
+
+    FobosOrbit.rotation.y += 0.01 * g;
+    DeimosOrbit.rotation.y += 0.006 * g;
 
 
     MercuryMesh.position.x = 20;
@@ -587,22 +607,35 @@ function animate() {
     render.render(scene, camera);
 
     // Translação da Terra
-    earthOrbit.rotation.y += 0.001 * g;
+earthOrbit.rotation.y += 0.001 * g;
 
-    // Chegou a uma volta completa?
-    const currentRotation = earthOrbit.rotation.y % (Math.PI * 2); // mantém entre 0 e 2π
-    const lastRotation = lastEarthRotation % (Math.PI * 2);
+// Normaliza a rotação atual entre 0 e 2π
+const normalizedRotation = (earthOrbit.rotation.y % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
 
-    // Detecta quando passou de uma volta completa (de 2π pra 0)
-    if (currentRotation < lastRotation) {
-    earthYears += 1;
-    console.log(`Ano ${earthYears}`);
+// Detecta a passagem pela origem
+if (!passouPorZero && normalizedRotation < 0.1) {
+    if (g > 0) {
+        earthYears += 1;
+    } else if (g < 0) {
+        earthYears -= 1;
     }
+    console.log(`Ano ${earthYears}`);
+    passouPorZero = true;
+}
 
-    // Atualiza valor antigo para próxima comparação
-    lastEarthRotation = earthOrbit.rotation.y;
+// Libera a trava depois que já passou bem longe do zero
+if (normalizedRotation > 1.0) {
+    passouPorZero = false;
+}
 
-    document.getElementById('year-counter').textContent = `Ano: ${earthYears}`;
+
+
+
+
+// Atualiza valor antigo para próxima comparação
+lastEarthRotation = earthOrbit.rotation.y;
+
+document.getElementById('year-counter').textContent = `Ano: ${earthYears}`;
 
 }
 

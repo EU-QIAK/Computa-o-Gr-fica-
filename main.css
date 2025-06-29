@@ -13,8 +13,8 @@ EDIT ON
 #info {
   position: fixed;
   top: 3%;
-  left: 35%;
-  right: 35%;
+  left: 38%;
+  right: 38%;
   background-color: hsla(0, 0%, 93%, 0.65); /* cinza claro translúcido */
   color: #000;
   text-align: center;
@@ -136,7 +136,7 @@ EDIT ON
 }
 #year-counter {
   position: fixed;
-  top: 10%; /* Mantém a 9% do topo */
+  top: 12%; /* Mantém a 9% do topo */
   left: 50%; /* Centraliza horizontalmente */
   transform: translateX(-50%); /* Ajusta para um perfeito centralizamento */
   width: auto; /* Permite que o conteúdo dite a largura, ou defina uma largura máxima */

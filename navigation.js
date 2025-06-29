@@ -1,7 +1,7 @@
 import * as THREE from 'https://unpkg.com/three@0.155.0/build/three.module.js';
 import { OrbitControls } from "https://esm.sh/three/addons/controls/OrbitControls.js";
 
-// ATUALIZAÇÂO 1.5.1 
+// ATUALIZAÇÂO 1.5.2 
 
 // fazendo aparecer uma linha branca nos planetas quando passar o mouse
 const raycaster = new THREE.Raycaster();
